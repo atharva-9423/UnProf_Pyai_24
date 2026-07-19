@@ -6,7 +6,7 @@
 [![Python Version](https://img.shields.io/badge/Python-3.8%2B-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![LangChain](https://img.shields.io/badge/LangChain-LCEL-green?style=for-the-badge&logo=langchain&logoColor=white)](https://python.langchain.com/)
-[![Google Gemini](https://img.shields.io/badge/Google%20Gemini-1.5%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/)
+[![Google Gemini](https://img.shields.io/badge/Google%20Gemini-3.5%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/)
 
 *The ultimate Document Intelligence API. Upload PDFs or Text files on the fly, instantly index them into a Vector Database, and chat with them using Advanced AI.*
 
@@ -41,9 +41,7 @@ Unlike previous days where documents were hardcoded into a folder, this API star
 ## 🚀 Setup & Usage
 
 ### 1. Install Dependencies
-Navigate to the `day24` folder and install dependencies:
 ```bash
-cd day24
 pip install -U -r requirements.txt
 ```
 
