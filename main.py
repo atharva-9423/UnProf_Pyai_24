@@ -3,7 +3,6 @@ import sys
 import tempfile
 import warnings
 
-# Suppress HuggingFace and warning messages
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 warnings.filterwarnings("ignore")
 
@@ -20,7 +19,6 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-# 🔐 Basic API Key Authentication (Hardcoded for demonstration)
 API_KEY = "my-secret-key"
 
 app = FastAPI(
@@ -29,13 +27,11 @@ app = FastAPI(
     version="2.0.0"
 )
 
-# Global variables
 vectorstore = None
 rag_chain = None
 text_splitter = None
 embeddings = None
 
-# Pydantic models for structured JSON request/response
 class ChatRequest(BaseModel):
     query: str
     chat_history: Optional[List[List[str]]] = []
@@ -65,17 +61,13 @@ def startup_event():
         print("\nWARNING: GEMINI_API_KEY environment variable not set.")
         sys.exit(1)
 
-    # 1. Initialize text splitter and embeddings
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-    # 2. Initialize an empty FAISS vectorstore with a tiny welcome document
-    # We need at least one document to initialize the FAISS schema properly.
     from langchain_core.documents import Document
     initial_doc = Document(page_content="Welcome to the RAG API. This is the initial system document. I can process any documents you upload.")
     vectorstore = FAISS.from_documents([initial_doc], embeddings)
 
-    # 3. Initialize the LCEL Chain
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
     llm = ChatGoogleGenerativeAI(
         model="gemini-3.5-flash", 
@@ -132,7 +124,6 @@ async def upload_document(file: UploadFile = File(...), api_key: str = Depends(v
     if not file.filename.endswith((".txt", ".pdf")):
         raise HTTPException(status_code=400, detail="Only .txt and .pdf files are supported.")
     
-    # Save the uploaded file temporarily
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(file.filename)[1])
     try:
         content = await file.read()
@@ -140,7 +131,6 @@ async def upload_document(file: UploadFile = File(...), api_key: str = Depends(v
         temp_file.flush()
         temp_file.close()
         
-        # Load the document
         if file.filename.endswith(".pdf"):
             loader = PyPDFLoader(temp_file.name)
         else:
@@ -148,13 +138,12 @@ async def upload_document(file: UploadFile = File(...), api_key: str = Depends(v
             
         docs = loader.load()
         
-        # Chunk the document
         splits = text_splitter.split_documents(docs)
         
         if not splits:
             raise HTTPException(status_code=400, detail="Could not extract text from the file.")
             
-        # Add chunks to the existing in-memory vectorstore
+
         vectorstore.add_documents(splits)
         
         return UploadResponse(
@@ -165,7 +154,6 @@ async def upload_document(file: UploadFile = File(...), api_key: str = Depends(v
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
     finally:
-        # Cleanup temporary file
         if os.path.exists(temp_file.name):
             os.remove(temp_file.name)
 
